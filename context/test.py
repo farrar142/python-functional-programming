@@ -58,12 +58,32 @@ class TestContext(TestCase):
         self.assertEqual(multiply(2)(2), 4)
         sum_and_multiply = sum(1)(multiply(3)(2))
         self.assertEqual(sum_and_multiply, 7)
-        sum_and_multiply = multiply(3).compose(sum(1))(2)
+        sum_and_multiply = multiply(3).pipe(sum(1))(2)
         self.assertEqual(sum_and_multiply, 7)
 
         @Context[int, str].wraps
         def to_str():
             return lambda x: str(x)
 
-        stringified = multiply(3).compose(to_str())(3)
+        stringified = multiply(3).pipe(to_str())(3)
         self.assertEqual(stringified, "9")
+
+    @note("같은 컨텍스트를 같지만 반환값이 다른 컨텍스트는 bind로 조합가능")
+    def test_6(self):
+        @Context[int, str].wraps
+        def return_str(a: int):
+            return lambda x: "fff"
+
+        @Context[int, float].wraps
+        def return_float(a: int):
+            return lambda x: 10.5
+
+        result = return_str(1).bind(return_float(1))(1)
+        self.assertEqual(result, 10.5)
+
+        @Context
+        def what_ther(a: int):
+            return lambda x: x * a
+
+        result = what_ther(10)(5)
+        print(result)

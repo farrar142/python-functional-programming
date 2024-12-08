@@ -24,5 +24,12 @@ class Context[C, T]:
 
         return wrapper
 
-    def compose(self, other: "Context[T,N]"):
+    def bind(self, other: "Context[C,N]"):
+        def wrapper(context: C):
+            self(context)
+            return other(context)
+
+        return Context[C, N](wrapper)
+
+    def pipe(self, other: "Context[T,N]"):
         return Context[C, N](lambda c: other(self(c)))
