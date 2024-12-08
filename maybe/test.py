@@ -38,7 +38,7 @@ class TestMaybe(TestCase):
     def test_5_2(self):
         maybe = Maybe.of(5).map(lambda x: Maybe.of(5))
         self.assertIsInstance(maybe.get(), Maybe)
-        maybe = Maybe.of(5).flat_map(lambda x: Maybe.of(5)).map(int)
+        maybe = Maybe.of(5).bind(lambda x: Maybe.of(5)).map(int)
         self.assertEqual(maybe.get(), 5)
 
     @note("메이비는 값 혹은 None을 반환해야됨")
@@ -52,51 +52,53 @@ class TestMaybe(TestCase):
         with self.assertRaises(Exception):
             maybe.value  # type:ignore
 
-    @note("메이비의 orElse로 값이 None일시 대체 값을 반환해야됨")
+    @note("메이비의 or_else로 값이 None일시 대체 값을 반환해야됨")
     def test_8(self):
-        maybe = Maybe[int].empty(None)
-        self.assertEqual(maybe.orElse(5), 5)
+        maybe = Maybe[int].nothing()
+        self.assertEqual(maybe.or_else(5), 5)
 
-    @note("메이비의 orElse에 함수값이 필요 할 시 orElseGet을 사용해야됨")
+    @note("메이비의 or_else에 함수값이 필요 할 시 or_elseGet을 사용해야됨")
     def test_9(self):
-        maybe = Maybe[int].empty(None)
-        self.assertEqual(maybe.orElseGet(lambda: 5), 5)
+        maybe = Maybe[int].nothing()
+        self.assertEqual(maybe.or_else_get(lambda: 5), 5)
 
-    @note("메이비의 orElseGet은 값이 있을 경우엔 실행되면 안됨")
+    @note("메이비의 or_else_get은 값이 있을 경우엔 실행되면 안됨")
     def test_10(self):
         maybe = Maybe[int].of(5)
 
         def get_func():
             raise Exception
 
-        self.assertEqual(maybe.orElseGet(get_func), 5)
+        self.assertEqual(maybe.or_else_get(get_func), 5)
 
-    @note("메이비의 orElseGet은 값이 없을 경우엔 실행되어야됨")
+    @note("메이비의 or_else_get은 값이 없을 경우엔 실행되어야됨")
     def test_11(self):
-        maybe = Maybe[int].empty(None)
+        maybe = Maybe[int].nothing()
 
         def get_func():
             raise Exception
 
         with self.assertRaises(Exception):
-            maybe.orElseGet(get_func)
+            maybe.or_else_get(get_func)
 
-    @note("메이비에 값이 없을 경우에 error를 반환하는 메서드가 orElseThrow가 있어야됨")
+    @note(
+        "메이비에 값이 없을 경우에 error를 반환하는 메서드가 or_else_throw가 있어야됨"
+    )
     def test_12(self):
-        maybe = Maybe[int].empty(None)
+        maybe = Maybe[int].nothing()
         with self.assertRaises(ZeroDivisionError):
-            maybe.orElseThrow(ZeroDivisionError)
+            maybe.or_else_throw(ZeroDivisionError)
 
-    @note("메이비에 값이 있을 경우에 orElseThrow는 에러를 반환하면 안됨")
+    @note("메이비에 값이 있을 경우에 or_else_throw는 에러를 반환하면 안됨")
     def test_13(self):
         maybe = Maybe.of(5)
-        self.assertEqual(maybe.orElseThrow(Exception), 5)
+        self.assertEqual(maybe.or_else_throw(Exception), 5)
 
-    @note("메이비의 orElseThrow는 Exception 인스턴스도 받아야됨")
+    @note("메이비의 or_else_throw는 Exception 인스턴스도 받아야됨")
     def test_14(self):
-        maybe = Maybe[int].empty(None)
+        maybe = Maybe[int].nothing()
         with self.assertRaises(ZeroDivisionError):
-            maybe.orElseThrow(ZeroDivisionError("인스턴스"))
+            maybe.or_else_throw(ZeroDivisionError("인스턴스"))
 
     @note("메이비의 wraps는 함수를 데코레이션 해야됨")
     def test_15(self):
@@ -107,23 +109,28 @@ class TestMaybe(TestCase):
         maybe = wrapped(1, 2)
         self.assertEqual(maybe.get(), 3)
 
-    @note("메이비 LightIdentity테스트 Maybe(x).chain(f) == f(x) ")
+    @note("메이비 왼쪽 항등법칙 테스트 Maybe.of(x).chain(f) == f(x) ")
     def test_16(self):
         @Maybe.wraps
         def square(a: int):
             return a * a
 
-        left = Maybe.of(5).flat_map(square)
+        left = Maybe.of(5).bind(square)
         right = square(5)
-        self.assertEqual(left.orElseThrow(), 25)
-        self.assertEqual(right.orElseThrow(), 25)
+        self.assertEqual(left.or_else_throw(), 25)
+        self.assertEqual(right.or_else_throw(), 25)
         self.assertEqual(left, right)
 
-    @note("메이비 RightIdentity테스트 Maybe.of(5).chain(Maybe.of) === Maybe(5)")
+    @note(
+        "메이비 오른쪽 항등법칙테스트 Maybe.of(x).chain(Maybe.of) == y === x.bind(Maybe.of)"
+    )
     def test_17(self):
+        @Maybe.wraps
+        def square(a: int):
+            return a * a
 
-        left = Maybe.of(5).flat_map(Maybe.of)
-        right = Maybe.of(5)
+        left = Maybe.of(5).bind(square)
+        right = left.bind(Maybe.of)
         self.assertEqual(left, right)
 
     @note(
@@ -138,8 +145,8 @@ class TestMaybe(TestCase):
         def stringify(a: int):
             return str(a)
 
-        left = Maybe.of(5).flat_map(square).flat_map(stringify)
-        right = Maybe.of(5).flat_map(lambda x: square(x).flat_map(stringify))
-        self.assertEqual(left.orElseThrow(), "25")
-        self.assertEqual(right.orElseThrow(), "25")
+        left = Maybe.of(5).bind(square).bind(stringify)
+        right = Maybe.of(5).bind(lambda x: square(x).bind(stringify))
+        self.assertEqual(left.or_else_throw(), "25")
+        self.assertEqual(right.or_else_throw(), "25")
         self.assertEqual(left, right)

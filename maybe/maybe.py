@@ -1,3 +1,4 @@
+from abc import ABC, abstractmethod
 import functools
 from typing import Callable, ParamSpec, Self, TypeVar
 
@@ -21,8 +22,12 @@ class Maybe[M]:
         return Maybe(cls.__cls_key, value)
 
     @classmethod
-    def empty(cls, value: None) -> "Maybe[M]":
-        return Maybe[M].of(value)
+    def just(cls, value: N) -> "Maybe[N]":
+        return Maybe[N].of(value)
+
+    @classmethod
+    def nothing(cls) -> "Maybe[M]":
+        return Maybe[M].of(None)
 
     @classmethod
     def call(cls, callable: Callable[[], N]) -> "Maybe[N]":
@@ -49,26 +54,25 @@ class Maybe[M]:
         new_value = callable(value)
         return Maybe.of(new_value)
 
-    def flat_map(self, callable: "Callable[[M],Maybe[N]]") -> "Maybe[N]":
+    def bind(self, func: "Callable[[M], Maybe[N]]") -> "Maybe[N]":
         value = self.get()
         if value == None:
-            return Maybe.of(None)
-        new_value = callable(value)
-        return new_value
+            return Maybe.nothing()
+        return func(value)
 
-    def orElse(self, orValue: M):
+    def or_else(self, orValue: N) -> "M|N":
         value = self.get()
         if value:
             return value
         return orValue
 
-    def orElseGet(self, orCallable: Callable[[], M]):
+    def or_else_get(self, orCallable: Callable[[], M]):
         value = self.get()
         if value:
             return value
         return orCallable()
 
-    def orElseThrow(self, exception: type[Exception] | Exception = Exception) -> M:
+    def or_else_throw(self, exception: type[Exception] | Exception = Exception) -> M:
         value = self.get()
         if value:
             return value
