@@ -2,12 +2,14 @@ from abc import ABC, abstractmethod
 import functools
 from typing import Callable, ParamSpec, Self, TypeVar
 
+from functor import Functor
+
 P = ParamSpec("P")
 M = TypeVar("M")
 N = TypeVar("N")
 
 
-class Maybe[M]:
+class Maybe[M](Functor[M]):
     __cls_key = object()
     __value: M | None
 
