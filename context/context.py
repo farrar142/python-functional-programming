@@ -1,18 +1,17 @@
 import functools
 from typing import Callable, ParamSpec, TypeVar
 
+from functor import Functor
+
 P = ParamSpec("P")
 # C = TypeVar("C")
 T = TypeVar("T")
 N = TypeVar("N")
 
 
-class Context[C, T]:
-    def __init__(self, func: Callable[[C], T]):
-        self.__func = func
-
+class Context[C, T](Functor[Callable[[C], T]]):
     def __call__(self, context: C):
-        return self.__func(context)
+        return self.value(context)
 
     @classmethod
     def wraps(
