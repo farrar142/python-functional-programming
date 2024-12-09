@@ -22,3 +22,11 @@ def note(note: str):
         return wrapper
 
     return decorator
+
+
+def pass_test(callable: Callable[P, T]) -> Callable[P, None]:
+    @wraps(callable)
+    def wrapper(*args: P.args, **kwargs: P.kwargs) -> None:
+        return None
+
+    return wrapper
