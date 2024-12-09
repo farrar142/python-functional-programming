@@ -11,13 +11,13 @@ N = TypeVar("N")
 
 class Maybe[M](Functor[M]):
     __cls_key = object()
-    __value: M | None
+    value: M | None
 
     def __init__(self, key: object, value: M | None):
         assert (
             key == self.__class__.__cls_key
         ), "You cannot initialize Maybe by __init__, use Maybe.of(value)"
-        self.__value = value
+        self.value = value
 
     @classmethod
     def of(cls, value: N | None) -> "Maybe[N]":
@@ -47,7 +47,7 @@ class Maybe[M](Functor[M]):
         return wrapper
 
     def get(self):
-        return self.__value
+        return self.value
 
     def map(self, callable: Callable[[M], N]) -> "Maybe[N]":
         value = self.get()
@@ -79,8 +79,3 @@ class Maybe[M](Functor[M]):
         if value:
             return value
         raise exception
-
-    def __eq__(self, obj: Self):
-        if isinstance(obj, Maybe):
-            return self.get() == obj.get()
-        return False

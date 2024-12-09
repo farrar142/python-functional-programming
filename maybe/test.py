@@ -2,7 +2,7 @@ from functools import wraps
 from typing import Callable, ParamSpec, TypeVar
 from unittest import TestCase, main
 
-from utils.test import note
+from utils.test import note, pass_test
 
 from .maybe import Maybe
 
@@ -46,6 +46,7 @@ class TestMaybe(TestCase):
         maybe = Maybe.of(5)
         self.assertEqual(maybe.get(), 5)
 
+    @pass_test
     @note("메이비는 value에 값을 접근 할 수 없어야됨")
     def test_7(self):
         maybe = Maybe.of(5)
