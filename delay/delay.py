@@ -1,5 +1,6 @@
-from functools import update_wrapper, wraps
 from typing import Callable, Generic, ParamSpec, TypeVar
+
+from functor import Functor
 
 
 P = ParamSpec("P")
@@ -8,15 +9,12 @@ T = TypeVar("T")
 N = TypeVar("N")
 
 
-class Delay(Generic[P, T]):
-    def __init__(self, func: Callable[P, T]):
-        self.func = func
-
+class Delay(Functor[Callable[P, T]], Generic[P, T]):
     def __call__(self, *args: P.args, **kwargs: P.kwargs):
-        return Delay(lambda: self.func(*args, **kwargs))
+        return Delay(lambda: self.value(*args, **kwargs))
 
     def run(self, *args: P.args, **kwargs: P.kwargs):
-        return self.func(*args, **kwargs)
+        return self.value(*args, **kwargs)
 
     def bind(self, delay: "Callable[[T],Delay[[],N]]") -> "Delay[P,N]":
         def combine(*args: P.args, **kwargs: P.kwargs) -> N:
@@ -26,4 +24,4 @@ class Delay(Generic[P, T]):
         return Delay[P, N](combine)
 
     def __repr__(self) -> str:
-        return self.func.__repr__()
+        return self.value.__repr__()
