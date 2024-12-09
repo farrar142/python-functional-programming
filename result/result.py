@@ -1,13 +1,15 @@
 import functools
 from typing import Callable, Literal, ParamSpec, TypeVar
 
+from functor import Functor
+
 
 P = ParamSpec("P")
 T = TypeVar("T")
 N = TypeVar("N")
 
 
-class Result[T]:
+class Result[T](Functor[T]):
     __cls_key = object()
     value: T | Exception
 
