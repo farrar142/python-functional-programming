@@ -150,3 +150,14 @@ class TestMaybe(TestCase):
         self.assertEqual(left.or_else_throw(), "25")
         self.assertEqual(right.or_else_throw(), "25")
         self.assertEqual(left, right)
+
+    def test_19(self):
+        class Container:
+            def __init__(self, value: int) -> None:
+                self.value = value
+
+            def power(self):
+                self.value = self.value * self.value
+                return self
+
+        result = Maybe.of(Container(1)).map(Container.power)
