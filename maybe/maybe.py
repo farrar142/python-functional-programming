@@ -9,9 +9,8 @@ M = TypeVar("M")
 N = TypeVar("N")
 
 
-class Maybe[M](Functor[M]):
+class Maybe[M](Functor[M | None]):
     __cls_key = object()
-    value: M | None
 
     def __init__(self, key: object, value: M | None):
         assert (

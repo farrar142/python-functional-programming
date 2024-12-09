@@ -9,9 +9,8 @@ T = TypeVar("T")
 N = TypeVar("N")
 
 
-class Result[T](Functor[T]):
+class Result[T](Functor[T | Exception]):
     __cls_key = object()
-    value: T | Exception
 
     def __init__(self, key: object, value: T | Exception):
         assert (
