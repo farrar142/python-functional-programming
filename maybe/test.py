@@ -186,3 +186,12 @@ class TestMaybeMonoid(TestCase):
         result_a = Maybe[int].combined(certain_x, random_y, lambda x, y: x * y)
         result_b = Maybe[int].combined(random_y, certain_x, lambda x, y: x * y)
         self.assertEqual(result_a, result_b)
+
+    @note("메이비 결합법칙 테스트")
+    @note("메이비는 x,y,z에 대해 (x*y)*z == x*(y*z)가 성립함")
+    def test_maybe_association(self):
+        x, y, z = Maybe.of(2), Maybe.of(3), Maybe.of(6)
+        multiplier: Callable[[int, int], int] = lambda x, y: x * y
+        left = x.combined(y, multiplier).combined(z, multiplier)
+        right = x.combined(y.combined(z, multiplier), multiplier)
+        self.assertEqual(left, right)
