@@ -30,6 +30,9 @@ class Maybe[M](Functor[M | None]):
     def nothing(cls) -> "Maybe[M]":
         return Maybe[M].of(None)
 
+    def is_nothing(self):
+        return self.get() == None
+
     @classmethod
     def call(cls, callable: Callable[[], N]) -> "Maybe[N]":
         try:
@@ -60,6 +63,11 @@ class Maybe[M](Functor[M | None]):
         if value == None:
             return Maybe.nothing()
         return func(value)
+
+    def combined(self, other: "Self", operator: "Callable[[M,M],M]"):
+        if self.is_nothing() or other.is_nothing():
+            return self.__class__.nothing()
+        return Maybe.of(operator(self.or_else_throw(), other.or_else_throw()))
 
     def or_else(self, orValue: N) -> "M|N":
         value = self.get()
