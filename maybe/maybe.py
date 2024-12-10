@@ -7,6 +7,7 @@ from functor import Functor
 P = ParamSpec("P")
 M = TypeVar("M")
 N = TypeVar("N")
+L = TypeVar("L")
 
 
 class Maybe[M](Functor[M | None]):
@@ -64,7 +65,7 @@ class Maybe[M](Functor[M | None]):
             return Maybe.nothing()
         return func(value)
 
-    def combined(self, other: "Self", operator: "Callable[[M,M],M]"):
+    def combined(self, other: "Maybe[N]", operator: "Callable[[M,N],L]"):
         if self.is_nothing() or other.is_nothing():
             return self.__class__.nothing()
         return Maybe.of(operator(self.or_else_throw(), other.or_else_throw()))
