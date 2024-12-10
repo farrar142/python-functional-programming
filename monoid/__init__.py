@@ -13,6 +13,10 @@ class Monoid[T]:
 
     def bind(self, func: Callable[[T], "Monoid[U]"]) -> "Monoid[U]": ...
 
+    """이항연산정의"""
+
     def combined(
         self, other: "Monoid[U]", operator: "Callable[[T,U],V]"
     ) -> "Monoid[V]": ...
+
+    """이항연산정의"""
