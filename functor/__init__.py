@@ -1,4 +1,4 @@
-from typing import Self
+from typing import Self, TypeVar
 
 
 class Functor[V]:
@@ -19,8 +19,8 @@ class Functor[V]:
     def __init__(self, value: V):
         self.value = value
 
-    def __eq__(self, obj: Self):
-        if self.__class__ == obj.__class__:
+    def __eq__(self, obj: object):
+        if isinstance(obj, self.__class__):
             return self.value == obj.value
         return False
 
