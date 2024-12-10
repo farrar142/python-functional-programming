@@ -162,3 +162,14 @@ class TestMaybe(TestCase):
                 return self
 
         result = Maybe.of(Container(1)).map(Container.power)
+
+
+class TestMaybeMonoid(TestCase):
+    @note("메이비 연결성 테스트")
+    @note("메이비는 이항연산이 존재해야됨")
+    def test_maybe_has_binary_operator(self):
+        maybe_x = Maybe.of(5)
+        maybe_y = Maybe.of(5)
+
+        maybe_z = Maybe.combined(maybe_x, maybe_y, lambda x, y: x + y)
+        self.assertEqual(maybe_z.get(), 10)
