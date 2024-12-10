@@ -3,6 +3,7 @@ from random import randint
 from typing import Callable, ParamSpec, TypeVar
 from unittest import TestCase, main
 
+from monoid.test import generate_monoid_test
 from utils.test import note, pass_test
 
 from .maybe import Maybe
@@ -153,45 +154,5 @@ class TestMaybe(TestCase):
         self.assertEqual(right.or_else_throw(), "25")
         self.assertEqual(left, right)
 
-    def test_19(self):
-        class Container:
-            def __init__(self, value: int) -> None:
-                self.value = value
 
-            def power(self):
-                self.value = self.value * self.value
-                return self
-
-        result = Maybe.of(Container(1)).map(Container.power)
-
-
-class TestMaybeMonoid(TestCase):
-    @note("메이비 연결성 테스트")
-    @note("메이비는 이항연산이 존재해야됨")
-    def test_maybe_has_connectivity(self):
-        maybe_x = Maybe.of(5)
-        maybe_y = Maybe.of(5)
-
-        maybe_z = Maybe[int].combined(maybe_x, maybe_y, lambda x, y: x + y)
-        self.assertEqual(maybe_z.get(), 10)
-
-    @note("메이비 항등원 테스트")
-    @note("메이비는 특정한 값 x가 있어 임의의 y에 대해 x*y == y*x = y를 만족해야됨")
-    def test_maybe_has_identity(self):
-        certain_x = Maybe[int].nothing()
-        random_y = Maybe.of(randint(1, 100))
-        result_a = Maybe[int].combined(certain_x, random_y, lambda x, y: x - y)
-        result_b = Maybe[int].combined(random_y, certain_x, lambda x, y: x - y)
-        self.assertEqual(result_a, result_b)
-        result_a = Maybe[int].combined(certain_x, random_y, lambda x, y: x * y)
-        result_b = Maybe[int].combined(random_y, certain_x, lambda x, y: x * y)
-        self.assertEqual(result_a, result_b)
-
-    @note("메이비 결합법칙 테스트")
-    @note("메이비는 x,y,z에 대해 (x*y)*z == x*(y*z)가 성립함")
-    def test_maybe_association(self):
-        x, y, z = Maybe.of(2), Maybe.of(3), Maybe.of(6)
-        multiplier: Callable[[int, int], int] = lambda x, y: x * y
-        left = x.combined(y, multiplier).combined(z, multiplier)
-        right = x.combined(y.combined(z, multiplier), multiplier)
-        self.assertEqual(left, right)
+TestMaybeMonoid = generate_monoid_test(Maybe)
