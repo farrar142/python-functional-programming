@@ -5,6 +5,12 @@ V = TypeVar("V")
 
 
 class Monoid[T]:
+    def __init__(self, value: T):
+        self.value = value
+
+    @classmethod
+    def of(cls, value: T):
+        return cls(value)
 
     @classmethod
     def identity(cls) -> Self: ...
