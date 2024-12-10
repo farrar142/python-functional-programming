@@ -11,3 +11,6 @@ class Functor[V]:
         if self.__class__ == obj.__class__:
             return self.value == obj.value
         return False
+
+    def __repr__(self):
+        return f"<{self.__class__.__name__} : {self.value}>"
