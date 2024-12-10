@@ -10,16 +10,9 @@ N = TypeVar("N")
 
 
 class Result[T](Functor[T | Exception]):
-    __cls_key = object()
-
-    def __init__(self, key: object, value: T | Exception):
-        assert (
-            key == self.__class__.__cls_key
-        ), "You cannot initialize Result by __init__, use Result.of(value)"
-
     @classmethod
     def of(cls, value: T | Exception):
-        return cls(cls.__cls_key, value)
+        return cls(value)
 
     @classmethod
     def wraps(cls, func: Callable[P, N]) -> "Callable[P, Result[N]]":
@@ -42,9 +35,8 @@ class Result[T](Functor[T | Exception]):
 class Success(Result[T]):
     value: T
 
-    def __init__(self, key: object, value: T):
+    def __init__(self, value: T):
         self.value = value
-        super().__init__(key, value)
 
     def bind(self, callable: Callable[[T], N]) -> "Result[N]":
         try:
@@ -68,9 +60,8 @@ class Success(Result[T]):
 class Failed(Result[T]):
     value: Exception
 
-    def __init__(self, key: object, value: Exception):
+    def __init__(self, value: Exception):
         self.value = value
-        super().__init__(key, value)
 
     def bind(self, callable: Callable[P, N]):
         return self
