@@ -5,6 +5,6 @@ if __name__ == "__main__":
     from result.test import TestResult, TestResultMonoid
     from context.test import TestContext
     from state.test import TestState
-    from delay.test import TestDelay
+    from delay.test import TestDelay, TestDelayMonoid
 
     main()

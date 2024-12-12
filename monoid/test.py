@@ -22,7 +22,7 @@ def generate_monoid_test(monoid_class: type[Monoid[int]]):
 
         @note(f"{monoid_class} 항등원 테스트")
         @note(
-            f"메이비는 특정한 값 x가 있어 임의의 y에 대해 x*y == y*x = y를 만족해야됨"
+            f"{monoid_class} 특정한 값 x가 있어 임의의 y에 대해 x*y == y*x = y를 만족해야됨"
         )
         def test_monoid_has_identity(self):
             certain = Monoid.identity()

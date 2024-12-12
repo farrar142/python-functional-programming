@@ -1,6 +1,7 @@
 from typing import Callable, Generic, ParamSpec, TypeVar
 
 from functor import Functor
+from monoid import Monoid
 
 
 P = ParamSpec("P")
@@ -9,7 +10,15 @@ T = TypeVar("T")
 N = TypeVar("N")
 
 
-class Delay(Functor[Callable[P, T]], Generic[P, T]):
+class Delay(Functor[Callable[P, T]], Monoid[Callable[P, T]]):
+    @classmethod
+    def of(cls, func: Callable[P, T]):
+        return cls(func)
+
+    @classmethod
+    def identity(cls) -> "Delay[[N],N]":
+        return Delay(lambda x: x)
+
     def __call__(self, *args: P.args, **kwargs: P.kwargs):
         return Delay(lambda: self.value(*args, **kwargs))
 
@@ -22,6 +31,13 @@ class Delay(Functor[Callable[P, T]], Generic[P, T]):
             return delay(t_value).run()
 
         return Delay[P, N](combine)
+
+    def combined(
+        self,
+        other: "Delay[[T],N]",
+        operator: Callable[[Callable[P, T], Callable[[T], N]], Callable[P, N]],
+    ):
+        return Delay(operator(self.value, other.value))
 
     def __repr__(self) -> str:
         return self.value.__repr__()
