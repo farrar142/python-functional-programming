@@ -1,7 +1,9 @@
 from functools import wraps
+from random import randint
 from typing import Callable, ParamSpec, TypeVar
 from unittest import TestCase, main
 
+from monoid.test import generate_monoid_test
 from utils.test import note, pass_test
 
 from .maybe import Maybe
@@ -152,13 +154,5 @@ class TestMaybe(TestCase):
         self.assertEqual(right.or_else_throw(), "25")
         self.assertEqual(left, right)
 
-    def test_19(self):
-        class Container:
-            def __init__(self, value: int) -> None:
-                self.value = value
 
-            def power(self):
-                self.value = self.value * self.value
-                return self
-
-        result = Maybe.of(Container(1)).map(Container.power)
+TestMaybeMonoid = generate_monoid_test(Maybe)

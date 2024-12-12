@@ -3,24 +3,27 @@ import functools
 from typing import Callable, ParamSpec, Self, TypeVar
 
 from functor import Functor
+from monoid import Monoid
 
 P = ParamSpec("P")
 M = TypeVar("M")
 N = TypeVar("N")
+L = TypeVar("L")
 
 
-class Maybe[M](Functor[M | None]):
+class Maybe[M](Functor[M | None], Monoid[M | None]):
     __cls_key = object()
 
-    def __init__(self, key: object, value: M | None):
-        assert (
-            key == self.__class__.__cls_key
-        ), "You cannot initialize Maybe by __init__, use Maybe.of(value)"
+    def __init__(self, value: M | None):
         self.value = value
 
     @classmethod
     def of(cls, value: N | None) -> "Maybe[N]":
-        return Maybe(cls.__cls_key, value)
+        return Maybe(value)
+
+    @classmethod
+    def identity(cls) -> "Maybe[M]":
+        return cls.nothing()
 
     @classmethod
     def just(cls, value: N) -> "Maybe[N]":
@@ -29,6 +32,9 @@ class Maybe[M](Functor[M | None]):
     @classmethod
     def nothing(cls) -> "Maybe[M]":
         return Maybe[M].of(None)
+
+    def is_nothing(self):
+        return self.get() == None
 
     @classmethod
     def call(cls, callable: Callable[[], N]) -> "Maybe[N]":
@@ -60,6 +66,11 @@ class Maybe[M](Functor[M | None]):
         if value == None:
             return Maybe.nothing()
         return func(value)
+
+    def combined(self, other: "Maybe[N]", operator: "Callable[[M,N],L]"):
+        if self.is_nothing() or other.is_nothing():
+            return self.__class__.nothing()
+        return Maybe.of(operator(self.or_else_throw(), other.or_else_throw()))
 
     def or_else(self, orValue: N) -> "M|N":
         value = self.get()

@@ -1,5 +1,6 @@
 from unittest import TestCase
 
+from monoid.test import generate_monoid_test
 from result.result import Success, Failed, Result
 from utils.test import note
 
@@ -66,3 +67,6 @@ class TestResult(TestCase):
         self.assertIsInstance(r1.value, ImportError)
         r2 = result.flat_bind(lambda x: zdiverror())
         self.assertIsInstance(r2.value, ZeroDivisionError)
+
+
+TestResultMonoid = generate_monoid_test(Result)
