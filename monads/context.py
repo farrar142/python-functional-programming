@@ -1,7 +1,7 @@
 import functools
 from typing import Callable, ParamSpec, TypeVar
 
-from functor import Functor
+from .functor import Functor
 
 P = ParamSpec("P")
 # C = TypeVar("C")

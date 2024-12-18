@@ -1,7 +1,7 @@
 from typing import Callable, Generic, ParamSpec, TypeVar
 
-from functor import Functor
-from monoid import Monoid
+from .functor import Functor
+from .monoid import Monoid
 
 
 P = ParamSpec("P")
