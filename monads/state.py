@@ -1,6 +1,6 @@
 from typing import Callable, ParamSpec, TypeVar
 
-from functor import Functor
+from .functor import Functor
 
 
 # 제너릭 타입 변수 정의

@@ -2,8 +2,8 @@ from abc import ABC, abstractmethod
 import functools
 from typing import Callable, ParamSpec, Self, TypeVar
 
-from functor import Functor
-from monoid import Monoid
+from .functor import Functor
+from .monoid import Monoid
 
 P = ParamSpec("P")
 M = TypeVar("M")

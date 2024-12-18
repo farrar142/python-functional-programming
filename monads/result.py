@@ -1,8 +1,8 @@
 import functools
 from typing import Callable, Literal, ParamSpec, TypeVar
 
-from functor import Functor
-from monoid import Monoid
+from .functor import Functor
+from .monoid import Monoid
 
 
 P = ParamSpec("P")
