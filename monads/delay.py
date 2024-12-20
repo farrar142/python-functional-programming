@@ -25,6 +25,13 @@ class Delay(Functor[Callable[P, T]], Monoid[Callable[P, T]]):
     def run(self, *args: P.args, **kwargs: P.kwargs):
         return self.value(*args, **kwargs)
 
+    def map(self, func: "Callable[[T],N]") -> "Delay[P,N]":
+        def wrapper(*args: P.args, **kwargs: P.kwargs) -> N:
+            t_value = self.run(*args, **kwargs)
+            return func(t_value)
+
+        return Delay[P, N](wrapper)
+
     def bind(self, delay: "Callable[[T],Delay[[],N]]") -> "Delay[P,N]":
         def combine(*args: P.args, **kwargs: P.kwargs) -> N:
             t_value = self.run(*args, **kwargs)
